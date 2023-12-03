@@ -1,0 +1,80 @@
+cmake_minimum_required(VERSION 3.6)
+
+project(ArduinoUDPClient VERSION 1 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 11)
+
+SET(SFML_DIR "/opt/homebrew/opt/sfml/lib/cmake/SFML")
+set(GLEW_DIR "/opt/homebrew/Cellar/glew/2.2.0_1/include")
+set(GLFW_DIR "/opt/homebrew/Cellar/glfw/3.3.8/include")
+
+include_directories( ${PROJECT_SOURCE_DIR}/ )
+include_directories( ${PROJECT_SOURCE_DIR}/include )
+include_directories( ${PROJECT_SOURCE_DIR}/imgui )
+
+include_directories(/opt/homebrew/Cellar/libwebsockets/4.3.2_1/include)
+include_directories(/opt/homebrew/Cellar/openssl@3/3.1.4/include)
+
+find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
+
+find_package(SFML COMPONENTS system graphics audio network REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(glfw3 REQUIRED)
+
+set(IMGUI
+        imgui/imconfig.h
+        imgui/imgui.cpp
+        imgui/imgui.h
+        imgui/imgui_demo.cpp
+        imgui/imgui_draw.cpp
+        imgui/imgui_internal.h
+        imgui/imgui_tables.cpp
+        imgui/imgui_widgets.cpp
+        imgui/imstb_rectpack.h
+        imgui/imstb_textedit.h
+        imgui/imstb_truetype.h
+        imgui/imconfig-SFML.h
+        imgui/imgui-SFML.cpp
+        imgui/imgui-SFML.h
+        imgui/imgui-SFML_export.h
+)
+
+set(HEADERS
+        include/BasicArduFrame.h
+        include/ClientUDPThread.h
+)
+
+set(SOURCES
+        BasicArduFrame.cpp
+        ClientUDPThread.cpp
+        main.cpp
+)
+
+#set(BAMOTOR
+#        BasicArduMotor/BasicArduMotor.h
+#)
+#
+#set(BCC
+#        BasicCarController/BasicCarController.h
+#)
+
+set(BATL
+        BasicArduTrafficLights/BasicArduTrafficLights.h
+        BasicArduTrafficLights/BasicArduTrafficLights.cpp
+)
+
+set(BALCD
+        BasicArduLCD/BasicArduLCD.h
+        BasicArduLCD/BasicArduLCD.cpp
+)
+
+add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES} ${IMGUI} ${BATL} ${BALCD} ${BAMOTOR} ${BCC} ClientWebSocketThread.h)
+
+if(WIN32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE sfml-window sfml-network sfml-graphics sfml-system opengl32)
+endif()
+
+if(UNIX)
+    target_link_libraries(${PROJECT_NAME} PRIVATE sfml-window sfml-network sfml-graphics sfml-system glfw GLEW::GLEW ${OPENGL_gl_LIBRARY} /opt/homebrew/Cellar/libwebsockets/4.3.2_1/lib/libwebsockets.dylib)
+endif()
